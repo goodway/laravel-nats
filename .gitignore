@@ -1,0 +1,13 @@
+# Dependencies
+composer.lock
+composer.phar
+vendor
+
+.env
+
+# Editor files
+/.fleet
+/.idea
+/.vscode
+*.bak
+.idea
