@@ -1,0 +1,71 @@
+<?php
+
+namespace Goodway\LaravelNats;
+
+use Basis\Nats\Message\Payload;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+abstract class NatsMessage implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * You can set specific subject for your job message payload with $subject variable
+     * @var string
+     */
+    public string $subject = 'default';
+
+    /**
+     * Generates a message body to serialize
+     * @return mixed
+     */
+    abstract public function body(): mixed;
+
+    /**
+     * Summary data that will be transmitted to your queue
+     * @return Payload
+     */
+    public function handle(): Payload
+    {
+        return new Payload(
+            serialize($this->body()),
+            $this->headers(),
+            $this->subject,
+            $this->getTimestamp(),
+        );
+    }
+
+    public function headers(): array
+    {
+        return [];
+    }
+
+    /**
+     * Sets/updates subject for job message
+     * @param string $subject
+     * @return $this
+     */
+    public function setSubject(string $subject): static
+    {
+        $this->subject = $subject;
+        return $this;
+    }
+
+    /**
+     * Returns default timestamp for message payload
+     * @return int
+     */
+    public function getTimestamp(): int
+    {
+        /**
+         * Optional as additional info.
+         * Nats operate with nanoseconds, but it is not supported in PHP. Return ms instead.
+         */
+        return now()->getTimestampMs();
+    }
+
+}
