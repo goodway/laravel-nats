@@ -18,11 +18,10 @@ class NatsQueue extends Queue implements QueueContract
         protected string     $consumerGroup,
         protected string     $jetStream,
         protected string     $jetStreamRetentionPolicy = 'workqueue',
-        protected string     $consumerPrefix = 'con_',
+        protected string     $consumerPrefix = 'con',
         protected int        $consumerIterations = 3,
         protected int        $batchSize = 10
-    )
-    {}
+    ) {}
 
 
     public function size($queue = null)
@@ -54,16 +53,11 @@ class NatsQueue extends Queue implements QueueContract
     public function getConsumerName(string $queue): string
     {
         $validate = $this->jetStreamRetentionPolicy === RetentionPolicy::WORK_QUEUE ?
-            $this->consumerGroup : $this->consumerPrefix . '_' . $this->consumerGroup . '_' . $queue;
+            $this->consumerGroup : ($this->consumerPrefix ? $this->consumerPrefix . '_' : '') . $this->consumerGroup . '_' . $queue;
         return preg_replace(
             '~[\\\\/:*?"<>|+-.]~', '', $validate);
     }
 
-    /**
-     * SUB jetstream
-     * @param $queue
-     * @return void
-     */
     public function pop($queue = null)
     {
         try {
@@ -71,12 +65,6 @@ class NatsQueue extends Queue implements QueueContract
             $stream = $this->clientSub->getApi()->getStream($this->jetStream);
             $consumer = $stream->getConsumer($this->getConsumerName($queue));
 
-            /**
-             * Sets:
-             * how many messages would be requested from nats stream
-             * how many times message request should be sent
-             *
-             */
             $consumer->setBatching($this->batchSize) // how many messages would be requested from nats stream
                 ->setIterations($this->consumerIterations) // how many times message request should be sent
 //                ->setExpires(10)

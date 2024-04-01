@@ -3,20 +3,18 @@
 namespace Goodway\LaravelNats\Queue\Handlers;
 
 
+use Goodway\LaravelNats\Events\NatsQueueMessageReceived;
 use Illuminate\Support\Facades\Log;
 
 class NatsQueueHandler
 {
     /**
-     * @param $message
-     * @param string $topic
+     * @param string $message serialized message from queue
+     * @param string $topic topic name
      */
-    public function __construct($message, string $topic) {
+    public function __construct(string $message, string $topic) {
 
-        /**
-         * Some handler code here
-         */
-        $obj1 = unserialize($message);
+        event(new NatsQueueMessageReceived($topic, $message));
 
     }
 }

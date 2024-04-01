@@ -22,7 +22,7 @@ class NatsQueueProvider extends ServiceProvider
     {
         $manager = $this->app['queue'];
         /**
-         * Register connector for custom 'nats' queue driver
+         * Register connector for 'nats' queue driver
          */
         $manager->addConnector('nats', function() {
             return new NatsQueueConnector();
