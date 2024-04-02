@@ -51,7 +51,7 @@ class NatsQueue extends Queue implements QueueContract
         $jobData = !is_string($jobData) ? serialize($jobData) : $jobData;
 
         var_dump($jobData);
-        $stream->create()->put($queue, $jobData);
+        $stream->put($queue, $jobData);
     }
 
     public function pushRaw($payload, $queue = null, array $options = [])
