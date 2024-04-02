@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-abstract class NatsMessage implements ShouldQueue
+abstract class NatsMessageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -63,7 +63,7 @@ abstract class NatsMessage implements ShouldQueue
     {
         /**
          * Optional as additional info.
-         * Nats operate with nanoseconds, but it is not supported in PHP. Return ms instead.
+         * Nats operate with nanoseconds, but it is not supported in PHP. Returns ms instead.
          */
         return now()->getTimestampMs();
     }

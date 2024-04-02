@@ -24,6 +24,20 @@ class NatsQueue extends Queue implements QueueContract
     ) {}
 
 
+    /**
+     * Generates consumer name based on prefix, group and queue
+     * @param string $queue
+     * @return string
+     */
+    public function getConsumerName(string $queue): string
+    {
+        $validate = $this->jetStreamRetentionPolicy === RetentionPolicy::WORK_QUEUE ?
+            $this->consumerGroup : ($this->consumerPrefix ? $this->consumerPrefix . '_' : '') . $this->consumerGroup . '_' . $queue;
+        return preg_replace(
+            '~[\\\\/:*?"<>|+-.]~', '', $validate);
+    }
+
+
     public function size($queue = null)
     {
         // TODO: Implement size() method.
@@ -48,14 +62,6 @@ class NatsQueue extends Queue implements QueueContract
     public function later($delay, $job, $data = '', $queue = null)
     {
         // TODO: Implement later() method.
-    }
-
-    public function getConsumerName(string $queue): string
-    {
-        $validate = $this->jetStreamRetentionPolicy === RetentionPolicy::WORK_QUEUE ?
-            $this->consumerGroup : ($this->consumerPrefix ? $this->consumerPrefix . '_' : '') . $this->consumerGroup . '_' . $queue;
-        return preg_replace(
-            '~[\\\\/:*?"<>|+-.]~', '', $validate);
     }
 
     public function pop($queue = null)

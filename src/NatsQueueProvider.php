@@ -12,7 +12,10 @@ class NatsQueueProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/nats.php',
+            'nats'
+        );
     }
 
     /**
@@ -20,6 +23,8 @@ class NatsQueueProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->offerPublishing();
+
         $manager = $this->app['queue'];
         /**
          * Register connector for 'nats' queue driver
@@ -27,5 +32,22 @@ class NatsQueueProvider extends ServiceProvider
         $manager->addConnector('nats', function() {
             return new NatsQueueConnector();
         });
+    }
+
+    protected function offerPublishing(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        if (! function_exists('config_path')) {
+            // function not available and 'publish' not relevant in Lumen
+            return;
+        }
+
+        $this->publishes([
+            __DIR__.'/../config/nats.php' => config_path('nats.php'),
+        ], 'nats-config');
+
     }
 }
