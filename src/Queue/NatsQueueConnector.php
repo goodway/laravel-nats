@@ -2,8 +2,10 @@
 
 namespace Goodway\LaravelNats\Queue;
 
-use Basis\Nats\Client as NatsClient;
-use Basis\Nats\Configuration as NatsConfiguration;
+use Goodway\LaravelNats\Exceptions\NatsClientException;
+use Goodway\LaravelNats\NatsClientService;
+use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandler;
+use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandlerDefault;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 
 class NatsQueueConnector implements ConnectorInterface
@@ -12,31 +14,28 @@ class NatsQueueConnector implements ConnectorInterface
         //
     }
 
+    /**
+     * @throws NatsClientException
+     */
     public function connect(array $config): NatsQueue
     {
-        $configuration = new NatsConfiguration(
-            [
-                'host' => $config['host'],
-                'port' => $config['port'],
-                'user' => $config['user'],
-                'pass' => $config['password'],
-                'token' => $config['token'],
-                'nkey' => $config['nkey'],
-                'jwt' => $config['jwt'],
-                'reconnect' => $config['reconnect'],
-                'timeout' => $config['connection_timeout'],
-                'verbose' => $config['verbose_mode'],
-                'inboxPrefix' => $config['inbox_prefix'],
-                'pingInterval' => $config['ping_interval'],
-                'tlsKeyFile' => $config['ssl_key'],
-                'tlsCertFile' => $config['ssl_cert'],
-                'tlsCaFile' => $config['ssl_ca'],
-            ],
-        );
-//        $configuration->setDelay(0.001, NatsConfiguration::DELAY_LINEAR);
+        $clientConfConsumer = $config['consumer_client'] ?? 'default';
+        $clientConfPublisher = $config['publisher_client'] ?? 'default';
+        $separateIdentical = isset($config['queue_separated_clients']) && $config['queue_separated_clients'];
 
-        $clientSub = new NatsClient($configuration);
-        $clientPub = new NatsClient($configuration);
+        $clientSub = (new NatsClientService())->init($clientConfConsumer);
+//        $clientSub->setDelay(0.01, NatsConfiguration::DELAY_LINEAR);
+
+        $clientPub = $clientConfConsumer === $clientConfPublisher && !$separateIdentical ?
+            $clientSub
+            : (new NatsClientService())->init($clientConfPublisher)
+        ;
+
+        $queueHandler = isset($config['queue_handler'])
+            && is_subclass_of($config['queue_handler'], NatsQueueHandler::class) ?
+                $config['consumer_client']
+                : NatsQueueHandlerDefault::class
+        ;
 
         return new NatsQueue(
             $clientSub,
@@ -44,9 +43,12 @@ class NatsQueueConnector implements ConnectorInterface
             $config['consumer'],
             $config['jetstream'],
             $config['jetstream_retention_policy'],
-            $config['queue_consumer_prefix'],
-            $config['consumer_iterations'],
-            $config['default_batch_size'],
+            consumerCreate:  $config['queue_consumer_create'] ?? false,
+            consumerPrefix: $config['queue_consumer_prefix'],
+            consumerIterations: $config['consumer_iterations'] ?? 0,
+            batchSize: $config['default_batch_size'] ?? 0,
+            fireEvents: $config['fire_events'] ?? null,
+            queueHandler: $queueHandler,
         );
 
     }

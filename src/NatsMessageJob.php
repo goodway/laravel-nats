@@ -3,13 +3,14 @@
 namespace Goodway\LaravelNats;
 
 use Basis\Nats\Message\Payload;
+use Goodway\LaravelNats\Contracts\INatsMessageJob;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-abstract class NatsMessageJob implements ShouldQueue
+abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

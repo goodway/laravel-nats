@@ -2,9 +2,10 @@
 
 namespace Goodway\LaravelNats\Queue;
 
-use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandler;
 use Basis\Nats\Client as NatsClient;
 use Basis\Nats\Stream\RetentionPolicy;
+use Goodway\LaravelNats\Contracts\INatsQueueHandler;
+use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandlerDefault;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Queue;
 
@@ -18,9 +19,12 @@ class NatsQueue extends Queue implements QueueContract
         protected string     $consumerGroup,
         protected string     $jetStream,
         protected string     $jetStreamRetentionPolicy = 'workqueue',
+        protected ?bool      $consumerCreate = null,
         protected string     $consumerPrefix = 'con',
-        protected int        $consumerIterations = 3,
-        protected int        $batchSize = 10
+        protected int        $consumerIterations = 0,
+        protected int        $batchSize = 0,
+        protected ?bool      $fireEvents = null,
+        protected string     $queueHandler = NatsQueueHandlerDefault::class // you can put your custom queue handler
     ) {}
 
 
@@ -66,26 +70,42 @@ class NatsQueue extends Queue implements QueueContract
 
     public function pop($queue = null)
     {
-        try {
 
-            $stream = $this->clientSub->getApi()->getStream($this->jetStream);
-            $consumer = $stream->getConsumer($this->getConsumerName($queue));
+        $consumerName = $this->getConsumerName($queue);
 
-            $consumer->setBatching($this->batchSize) // how many messages would be requested from nats stream
-                ->setIterations($this->consumerIterations) // how many times message request should be sent
-//                ->setExpires(10)
-                ->handle(
-                    function ($msg) use ($queue) {
-                        new NatsQueueHandler($msg, $queue);
-                        // if you need to break on next iteration simply call interrupt method
-                        // batch will be processed to the end and the handling would be stopped
-//                        $consumer->interrupt();
-                    },
-                    function () { var_dump(".."); }
-            );
-        } catch (\Throwable $e) {
-            var_dump($e->getMessage());
+        /**
+         * @var INatsQueueHandler $handler
+         */
+        $handler = new $this->queueHandler(
+            $this->clientSub,
+            $this->jetStream,
+            $consumerName,
+            $queue,
+        );
+
+        $this->overridesHandlerAttributes($handler);
+
+        $handler->pop();
+
+    }
+
+    /**
+     * Overrides handler attributes with values coming from the queue configuration
+     * @param INatsQueueHandler $handler
+     */
+    private function overridesHandlerAttributes(INatsQueueHandler $handler): void
+    {
+        if ($this->batchSize) {
+            $handler->setBatchSize($this->batchSize);
         }
-
+        if ($this->consumerIterations) {
+            $handler->setIterations($this->consumerIterations);
+        }
+        if (!is_null($this->consumerCreate)) {
+            $handler->allowToCreateConsumer($this->consumerCreate);
+        }
+        if (!is_null($this->fireEvents)) {
+            $handler->withEvent($this->fireEvents);
+        }
     }
 }
