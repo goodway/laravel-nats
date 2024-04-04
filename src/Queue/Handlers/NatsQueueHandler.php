@@ -70,7 +70,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
 
             if (!$consumer->exists()) {
                 $excMsg = "Consumer '" . $this->consumer . "' doesnt exist";
-                if ($this->consumerCreate) {
+                if ($this->canCreateConsumer) {
                     $consumer->getConfiguration()->setSubjectFilter($this->queue);
                     $consumer->create();
                     $excMsg .= "\nTrying to create new consumer for a next listen ...";

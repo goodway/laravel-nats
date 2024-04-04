@@ -16,7 +16,12 @@ Feel free to contribute or give any feedback.
 This package can be used in Laravel 8 or higher. The minimum PHP version required is 8.1
 
 #### Config file
-This package publishes a config/nats.php file. If you already have a file by that name, you must rename or remove it, as it will conflict with this package. You could optionally merge your own values with those required by this package, as long as the keys that this package expects are present. See the source file for more details.
+This package publishes a config/nats.php file. 
+If you already have a file by that name, you must rename or remove it,
+as it will conflict with this package.
+You could optionally merge your own values with those required by this package,
+as long as the keys that this package expects are present.
+See the source file for more details.
 
 #### Nats Client
 As a Nats client 
@@ -24,7 +29,6 @@ we use an external [basis-company/nats.php](https://github.com/basis-company/nat
 the most popular, well-written and functional Nats client for PHP.
 Greatest thanks to Dmitry Krokhin ([nekufa](https://github.com/nekufa))!
 
----
 
 ## Installation
 The recommended way to install the library is through [Composer](http://getcomposer.org):
@@ -32,7 +36,12 @@ The recommended way to install the library is through [Composer](http://getcompo
 $ composer require goodway/laravel-nats
 ```
 
----
+You should publish 
+the [config/nats.php](https://github.com/goodway/laravel-nats/blob/main/config/nats.php) 
+config file with:
+```bash
+$ php artisan vendor:publish --provider="Goodway\LaravelNats\NatsQueueProvider"
+```
 
 ## Documentation will be added soon...
 
