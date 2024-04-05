@@ -5,7 +5,7 @@ namespace Goodway\LaravelNats\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NatsQueueMessageReceived
+class NatsQueueMessageSent
 {
     use Dispatchable, SerializesModels;
 

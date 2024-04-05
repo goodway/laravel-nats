@@ -5,6 +5,8 @@ namespace Goodway\LaravelNats\Queue;
 use Basis\Nats\Client as NatsClient;
 use Basis\Nats\Stream\RetentionPolicy;
 use Goodway\LaravelNats\Contracts\INatsQueueHandler;
+use Goodway\LaravelNats\Events\NatsQueueMessageSent;
+use Goodway\LaravelNats\Exceptions\NatsJetstreamException;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandlerDefault;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Queue;
@@ -47,15 +49,24 @@ class NatsQueue extends Queue implements QueueContract
         // TODO: Implement size() method.
     }
 
+    /**
+     * @throws NatsJetstreamException
+     */
     public function push($job, $data = '', $queue = null)
     {
         $stream = $this->clientPub->getApi()->getStream($this->jetStream);
 
+        if (!$stream->exists()) {
+            throw new NatsJetstreamException('Jetstream ' . $this->jetStream . ' not found', 404);
+        }
+
         $jobData = $job->handle();
         $jobData = !is_string($jobData) ? serialize($jobData) : $jobData;
 
-        var_dump($jobData);
         $stream->put($queue, $jobData);
+
+        event(new NatsQueueMessageSent($queue, $jobData));
+        var_dump($jobData);
     }
 
     public function pushRaw($payload, $queue = null, array $options = [])

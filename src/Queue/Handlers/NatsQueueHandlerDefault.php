@@ -22,7 +22,6 @@ class NatsQueueHandlerDefault extends NatsQueueHandler
      */
     public function handle($message, string $queue, Consumer $consumer): void
     {
-        var_dump(self::class . ' handle() called');
         new NatsQueueMessageHandler($message, $this->queue);
     }
 
