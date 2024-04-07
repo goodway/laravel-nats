@@ -61,11 +61,14 @@ class NatsQueue extends Queue implements QueueContract
         }
 
         $jobData = $job->handle();
-        $jobData = !is_string($jobData) ? serialize($jobData) : $jobData;
+        $serialized = !is_string($jobData) ? serialize($jobData) : $jobData;
 
-        $stream->put($queue, $jobData);
+        $stream->put($queue, $serialized);
 
-        event(new NatsQueueMessageSent($queue, $jobData));
+        if ($this->fireEvents) {
+            event(new NatsQueueMessageSent($queue, $jobData));
+        }
+
         var_dump($jobData);
     }
 

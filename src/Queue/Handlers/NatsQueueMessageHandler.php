@@ -2,15 +2,17 @@
 
 namespace Goodway\LaravelNats\Queue\Handlers;
 
+use Goodway\LaravelNats\DTO\NatsMessage;
+
 class NatsQueueMessageHandler
 {
     /**
-     * @param string $message serialized message from queue
+     * @param NatsMessage $message deserialized message from queue
      * @param string $subject queue/subject name
      */
-    public function __construct(string $message, string $subject) {
+    public function __construct(NatsMessage $message, string $subject) {
 
-        var_dump("\nNew message received from queue '$subject':\n" . $message);
+        var_dump("\nNew message received from queue '$subject':\n" . $message->render());
 
     }
 }

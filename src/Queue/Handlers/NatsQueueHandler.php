@@ -5,6 +5,7 @@ namespace Goodway\LaravelNats\Queue\Handlers;
 use Basis\Nats\Client as NatsClient;
 use Basis\Nats\Consumer\Consumer;
 use Goodway\LaravelNats\Contracts\INatsQueueHandler;
+use Goodway\LaravelNats\DTO\NatsMessage;
 use Goodway\LaravelNats\Events\NatsQueueMessageReceived;
 use Goodway\LaravelNats\Exceptions\NatsConsumerException;
 
@@ -17,7 +18,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
     public bool $fireEvent = true;
 
 
-    abstract public function handle($message, string $queue, Consumer $consumer);
+    abstract public function handle(NatsMessage $message, string $queue, Consumer $consumer);
     abstract public function handleEmpty(string $queue, Consumer $consumer);
 
 
@@ -69,7 +70,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
             $consumer = $stream->getConsumer($this->consumer);
 
             if (!$consumer->exists()) {
-                $excMsg = "Consumer '" . $this->consumer . "' doesnt exist";
+                $excMsg = "Consumer '" . $this->consumer . "' doesn't exist";
                 if ($this->canCreateConsumer) {
                     $consumer->getConfiguration()->setSubjectFilter($this->queue);
                     $consumer->create();
@@ -83,13 +84,15 @@ abstract class NatsQueueHandler implements INatsQueueHandler
             ->setIterations($this->iterations) // how many times message request should be sent
             ->handle(
                 function ($message) use ($consumer) {
+                    $messageData = NatsMessage::parse($message, true);
+
                     if ($this->fireEvent) {
-                        event(new NatsQueueMessageReceived($this->queue, $message));
+                        event(new NatsQueueMessageReceived($this->queue, $messageData));
                     }
 
-                    $this->handle($message, $this->queue, $consumer);
+                    $this->handle($messageData, $this->queue, $consumer);
 
-                    if ($this->interruptOn($message, $this->queue, $consumer)) {
+                    if ($this->interruptOn($messageData, $this->queue, $consumer)) {
                         $consumer->interrupt();
                     }
                 },
@@ -106,12 +109,12 @@ abstract class NatsQueueHandler implements INatsQueueHandler
     /**
      * True if you need to break on next iteration. The interrupt() method will be called,
      * batch will be processed to the end and the handling would be stopped
-     * @param $message
+     * @param NatsMessage $message
      * @param string $queue
      * @param Consumer $consumer
      * @return bool
      */
-    public function interruptOn($message, string $queue, Consumer $consumer): bool
+    public function interruptOn(NatsMessage $message, string $queue, Consumer $consumer): bool
     {
         return false;
     }

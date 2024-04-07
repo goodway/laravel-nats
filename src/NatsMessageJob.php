@@ -2,8 +2,8 @@
 
 namespace Goodway\LaravelNats;
 
-use Basis\Nats\Message\Payload;
 use Goodway\LaravelNats\Contracts\INatsMessageJob;
+use Goodway\LaravelNats\DTO\NatsMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,7 +18,7 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
      * You can set specific subject for your job message payload with $subject variable
      * @var string
      */
-    public string $subject = 'default';
+    protected string $subject = 'default';
 
     /**
      * Generates a message body to serialize
@@ -28,11 +28,11 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
 
     /**
      * Summary data that will be transmitted to your queue
-     * @return Payload
+     * @return NatsMessage
      */
-    public function handle(): Payload
+    public function handle(): NatsMessage
     {
-        return new Payload(
+        return new NatsMessage(
             serialize($this->body()),
             $this->headers(),
             $this->subject,

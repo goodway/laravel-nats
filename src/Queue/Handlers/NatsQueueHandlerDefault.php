@@ -3,6 +3,7 @@
 namespace Goodway\LaravelNats\Queue\Handlers;
 
 use Basis\Nats\Consumer\Consumer;
+use Goodway\LaravelNats\DTO\NatsMessage;
 
 /**
  * Default Strategy/Template that describes the options of receiving data from a queue
@@ -15,12 +16,12 @@ class NatsQueueHandlerDefault extends NatsQueueHandler
 
     /**
      * Default handler for a new message received
-     * @param $message
+     * @param NatsMessage $message
      * @param string $queue
      * @param Consumer $consumer
      * @return void
      */
-    public function handle($message, string $queue, Consumer $consumer): void
+    public function handle(NatsMessage $message, string $queue, Consumer $consumer): void
     {
         new NatsQueueMessageHandler($message, $this->queue);
     }
@@ -37,7 +38,7 @@ class NatsQueueHandlerDefault extends NatsQueueHandler
     }
 
 
-    public function interruptOn($message, string $queue, Consumer $consumer): bool
+    public function interruptOn(NatsMessage $message, string $queue, Consumer $consumer): bool
     {
         return false;
     }

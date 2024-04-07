@@ -2,7 +2,7 @@
 
 namespace Goodway\LaravelNats\Contracts;
 
-use Basis\Nats\Message\Payload;
+use Goodway\LaravelNats\DTO\NatsMessage;
 
 interface INatsMessageJob
 {
@@ -10,6 +10,6 @@ interface INatsMessageJob
     public function headers(): array;
     public function setSubject(string $subject);
     public function getTimestamp(): int;
-    public function handle(): Payload;
+    public function handle(): NatsMessage;
 
 }

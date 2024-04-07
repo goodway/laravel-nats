@@ -2,6 +2,7 @@
 
 namespace Goodway\LaravelNats\Events;
 
+use Goodway\LaravelNats\DTO\NatsMessage;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -14,7 +15,7 @@ class NatsQueueMessageSent
      */
     public function __construct(
         public string $subject,
-        public string $message
+        public NatsMessage $message
     ) {}
 
 }
