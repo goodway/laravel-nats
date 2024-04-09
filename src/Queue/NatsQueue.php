@@ -26,7 +26,8 @@ class NatsQueue extends Queue implements QueueContract
         protected int        $consumerIterations = 0,
         protected int        $batchSize = 0,
         protected ?bool      $fireEvents = null,
-        protected string     $queueHandler = NatsQueueHandlerDefault::class // you can put your custom queue handler
+        protected string     $queueHandler = NatsQueueHandlerDefault::class, // you can put your custom queue handler
+        protected bool       $verbose = false,
     ) {}
 
 
@@ -69,7 +70,10 @@ class NatsQueue extends Queue implements QueueContract
             event(new NatsQueueMessageSent($queue, $jobData));
         }
 
-        var_dump($jobData);
+        if ($this->verbose) {
+            var_dump($jobData);
+        }
+
     }
 
     public function pushRaw($payload, $queue = null, array $options = [])

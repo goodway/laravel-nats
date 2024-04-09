@@ -96,6 +96,7 @@ Example:
         //            'queue_handler' => 'someClass',
         'fire_events' => (bool)env('NATS_QUEUE_MESSAGE_EVENTS', true),
         'default_batch_size' => intval(env('NATS_DEFAULT_BATCH_SIZE', 10)),
+        'verbose_mode' => (bool)env('NATS_QUEUE_VERBOSE_MODE', true),
     ],
 ```
 
@@ -116,6 +117,7 @@ This functionality only works if the current connection client has the necessary
 - **fire_events** - [bool] if true then events will be fired during the publishing and handling received messages processes
 - **default_batch_size** - [int] batch size. How many messages would be requested from nats stream
 - **queue_handler** - [string, optional] classname of your custom queue handler. If not defined, then the standard handler will be used
+- **verbose_mode** - [bool] var_dump some additional info. For example on publishing
 
 
 You can specify one connection for publisher and another one for consumer,

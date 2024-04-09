@@ -49,6 +49,7 @@ class NatsQueueConnector implements ConnectorInterface
             batchSize: $config['default_batch_size'] ?? 0,
             fireEvents: $config['fire_events'] ?? null,
             queueHandler: $queueHandler,
+            verbose: $config['verbose_mode'] ?? false,
         );
 
     }
