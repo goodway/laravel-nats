@@ -11,6 +11,7 @@ Feel free to contribute or give any feedback.
 - [Publishing](#publishing-to-queue)
 - [Listening](#listening-from-queue)
 - [Message](#message-object-structure)
+- [Events](#events)
 
 ## Prerequisites
 
@@ -47,7 +48,7 @@ $ php artisan vendor:publish --provider="Goodway\LaravelNats\NatsQueueProvider"
 
 ## Configuration
 
-#### Client connection
+### Client connection
 
 The client connection configuration is specified in the config/nats.php file.
 Multiple configuration supported
@@ -74,7 +75,7 @@ Multiple configuration supported
 ```
 
 
-#### Queue connection
+### Queue connection
 
 Describe the queue connection configuration in your 'config/queue.php' file.
 It supports multiple client configurations.
@@ -98,13 +99,31 @@ Example:
     ],
 ```
 
+
+Fields description:
+
+- **driver** - [string] queue driver name. Use 'nats'
+- **consumer_client** - [string] client configuration name used to listen queue
+- **publisher_client** - [string] client configuration name used to publish messages
+- **jetstream** - [string] nats jetstream name
+- **jetstream_retention_policy** - [string] jetstream retention policy. Used on queue listening to generate the correct consumer name
+- **consumer** - [string] consumer group. Used for the final name of the consumer
+- **consumer_iterations** - [int] how many times message request should be sent
+- **queue_consumer_create** - [bool] if true, Queue will try to automatically create a new consumer if one is not found.
+This functionality only works if the current connection client has the necessary permissions to create a consumer
+- **queue_consumer_prefix** - [string] consumer prefix. Used for the final name of the consumer
+- **queue_separated_clients** - [bool] see description below
+- **fire_events** - [bool] if true then events will be fired during the publishing and handling received messages processes
+- **default_batch_size** - [int] batch size. How many messages would be requested from nats stream
+- **queue_handler** - [string, optional] classname of your custom queue handler. If not defined, then the standard handler will be used
+
+
 You can specify one connection for publisher and another one for consumer,
 or use one connection for both roles.
 
 You can also use one or separate connections
 if the publisher client configuration name matches the consumer client configuration.
 Use this feature through the **"queue_separated_clients"** bool attribute.
-
 
 ## Publishing to queue
 
@@ -151,7 +170,7 @@ dispatch((new TestNatsJob())
 ```
 
 
-#### Headers
+### Headers
 
 You can set a message headers using the headers() method of your class. Example:
 
@@ -191,8 +210,21 @@ php artisan queue:work nats --queue=queue-name
 }
 ```
 
+## Events
 
-## More documentation will be added soon...
+These events are fired during the publishing and listening processes.
+
+### NatsQueueMessageSent
+
+This event is fired after a message is sent to the queue
+
+### NatsQueueMessageReceived
+
+This event is fired when a message is received from the queue
+
+
+---
+#### More documentation will be added soon...
 
 ...
 
