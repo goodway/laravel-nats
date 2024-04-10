@@ -13,6 +13,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
 {
     public int $batchSize = 10;
     public int $iterations = 2;
+    public float $delay = 1;
 
     public bool $canCreateConsumer = false;
     public bool $fireEvent = true;
@@ -38,6 +39,12 @@ abstract class NatsQueueHandler implements INatsQueueHandler
     public function setIterations(int $iterations = 3): static
     {
         $this->iterations = $iterations;
+        return $this;
+    }
+
+    public function setDelay(float $delay = 1): static
+    {
+        $this->delay = $delay;
         return $this;
     }
 
@@ -82,6 +89,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
 
             $consumer->setBatching($this->batchSize) // how many messages would be requested from nats stream
             ->setIterations($this->iterations) // how many times message request should be sent
+            ->setDelay($this->delay)
             ->handle(
                 function ($message) use ($consumer) {
                     $messageData = NatsMessage::parse($message, true);

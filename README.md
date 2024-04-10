@@ -109,15 +109,16 @@ Fields description:
 - **jetstream** - [string] nats jetstream name
 - **jetstream_retention_policy** - [string] jetstream retention policy. Used on queue listening to generate the correct consumer name
 - **consumer** - [string] consumer group. Used for the final name of the consumer
-- **consumer_iterations** - [int] how many times message request should be sent
+- **consumer_iterations** - [int, optional, 2] how many times message request should be sent
+- **consumer_delay** - [float, optional, 1] how long to wait (in sec.) before sending the next request if an empty response was received
 - **queue_consumer_create** - [bool] if true, Queue will try to automatically create a new consumer if one is not found.
 This functionality only works if the current connection client has the necessary permissions to create a consumer
 - **queue_consumer_prefix** - [string] consumer prefix. Used for the final name of the consumer
 - **queue_separated_clients** - [bool] see description below
 - **fire_events** - [bool] if true then events will be fired during the publishing and handling received messages processes
-- **default_batch_size** - [int] batch size. How many messages would be requested from nats stream
+- **default_batch_size** - [int, optional, 10] batch size. How many messages would be requested from nats stream
 - **queue_handler** - [string, optional] classname of your custom queue handler. If not defined, then the standard handler will be used
-- **verbose_mode** - [bool] var_dump some additional info. For example on publishing
+- **verbose_mode** - [bool, optional, false] var_dump some additional info. For example on publishing
 
 
 You can specify one connection for publisher and another one for consumer,

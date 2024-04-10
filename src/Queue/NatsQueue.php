@@ -24,6 +24,7 @@ class NatsQueue extends Queue implements QueueContract
         protected ?bool      $consumerCreate = null,
         protected string     $consumerPrefix = 'con',
         protected int        $consumerIterations = 0,
+        protected float      $consumerDelay = 0,
         protected int        $batchSize = 0,
         protected ?bool      $fireEvents = null,
         protected string     $queueHandler = NatsQueueHandlerDefault::class, // you can put your custom queue handler
@@ -118,6 +119,9 @@ class NatsQueue extends Queue implements QueueContract
         }
         if ($this->consumerIterations) {
             $handler->setIterations($this->consumerIterations);
+        }
+        if ($this->consumerDelay) {
+            $handler->setDelay($this->consumerDelay);
         }
         if (!is_null($this->consumerCreate)) {
             $handler->allowToCreateConsumer($this->consumerCreate);

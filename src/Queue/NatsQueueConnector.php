@@ -46,6 +46,7 @@ class NatsQueueConnector implements ConnectorInterface
             consumerCreate:  $config['queue_consumer_create'] ?? false,
             consumerPrefix: $config['queue_consumer_prefix'],
             consumerIterations: $config['consumer_iterations'] ?? 0,
+            consumerDelay: $config['consumer_delay'] ?? 0,
             batchSize: $config['default_batch_size'] ?? 0,
             fireEvents: $config['fire_events'] ?? null,
             queueHandler: $queueHandler,
