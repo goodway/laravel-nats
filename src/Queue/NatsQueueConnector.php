@@ -33,7 +33,7 @@ class NatsQueueConnector implements ConnectorInterface
 
         $queueHandler = isset($config['queue_handler'])
             && is_subclass_of($config['queue_handler'], NatsQueueHandler::class) ?
-                $config['consumer_client']
+                $config['queue_handler']
                 : NatsQueueHandlerDefault::class
         ;
 
