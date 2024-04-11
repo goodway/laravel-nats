@@ -72,6 +72,10 @@ class NatsMessage
                 return new static ($payload);
             }
             $payload = unserialize($payload);
+
+            if ($payload instanceof self) {
+                return $payload;
+            }
         }
         if (is_array($payload)) {
             $payload = (object)$payload;
