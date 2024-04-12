@@ -2,11 +2,10 @@
 
 namespace Goodway\LaravelNats\DTO;
 
-use Basis\Nats\Message\Payload;
 use Goodway\LaravelNats\Exceptions\NatsMessageException;
 use Goodway\LaravelNats\NatsMessageJobBase;
 
-class NatsMessage
+final class NatsMessage
 {
     public function __construct(
         public string    $body = '', // serialized body
@@ -73,13 +72,13 @@ class NatsMessage
      * Creates an object from nats payload
      * @param array|object|string $payload
      * @param bool $deserialize
-     * @return static
+     * @return NatsMessage
      */
-    public static function parse(array|object|string $payload, bool $deserialize = false): static
+    public static function parse(array|object|string $payload, bool $deserialize = false): NatsMessage
     {
         if (is_string($payload)) {
             if (!$deserialize) {
-                return new static ($payload);
+                return new self ($payload);
             }
             $payload = unserialize($payload);
 
@@ -91,7 +90,7 @@ class NatsMessage
             $payload = (object)$payload;
         }
 
-        return new static (
+        return new self (
             $payload->body && is_string($payload->body) ? $payload->body : '',
             $payload->headers && is_array($payload->headers) ? $payload->headers : [],
             $payload->subject && is_string($payload->subject) ? $payload->subject : 'default',
