@@ -2,13 +2,12 @@
 
 namespace Goodway\LaravelNats\DTO;
 
-use Goodway\LaravelNats\Exceptions\NatsMessageException;
 use Goodway\LaravelNats\NatsMessageJobBase;
 
 final class NatsMessage
 {
     public function __construct(
-        public string    $body = '', // serialized body
+        public string    $body = '',
         public array     $headers = [],
         public string    $subject = 'default',
         public ?int      $timestamp = null,
@@ -81,11 +80,12 @@ final class NatsMessage
                 return new self ($payload);
             }
             $payload = unserialize($payload);
-
-            if ($payload instanceof self) {
-                return $payload;
-            }
         }
+
+        if ($payload instanceof self) {
+            return $payload;
+        }
+
         if (is_array($payload)) {
             $payload = (object)$payload;
         }
@@ -102,15 +102,10 @@ final class NatsMessage
      * To broadcast current message to certain connection and queue
      * @param string $queueConnection
      * @param string|null $queue
-     * @throws NatsMessageException
      */
     public function broadcast(string $queueConnection, ?string $queue = null): void
     {
-        $body = unserialize($this->body);
-        if (!$body) {
-            throw new NatsMessageException('Can not deserialize message body to broadcast');
-        }
-        $job = new NatsMessageJobBase($body, $this->headers(), $this->subject());
+        $job = new NatsMessageJobBase($this->body(), $this->headers(), $this->subject());
 
         dispatch($job)
             ->onConnection($queueConnection)
