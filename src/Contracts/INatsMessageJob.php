@@ -10,6 +10,6 @@ interface INatsMessageJob
     public function headers(): array;
     public function setSubject(string $subject);
     public function getTimestamp(): int;
-    public function handle(): NatsMessage;
+    public function handle(): array;
 
 }

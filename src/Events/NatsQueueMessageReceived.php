@@ -14,8 +14,8 @@ class NatsQueueMessageReceived
      * Create a new event instance.
      */
     public function __construct(
-        public string $subject,
-        public NatsMessage $message
+        public readonly string $subject,
+        public readonly NatsMessage $message
     ) {}
 
 }

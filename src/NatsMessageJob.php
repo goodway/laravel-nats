@@ -28,16 +28,16 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
 
     /**
      * Summary data that will be transmitted to your queue
-     * @return NatsMessage
+     * @return
      */
-    public function handle(): NatsMessage
+    public function handle(): array
     {
-        return new NatsMessage(
+        return (new NatsMessage(
             serialize($this->body()),
             $this->headers(),
             $this->subject,
             $this->getTimestamp(),
-        );
+        ))->toArray();
     }
 
     public function headers(): array

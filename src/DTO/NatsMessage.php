@@ -59,6 +59,16 @@ class NatsMessage
         return $this->body;
     }
 
+    public function toArray(): array
+    {
+        return [
+            'body' => $this->body,
+            'headers' => $this->headers,
+            'subject' => $this->subject,
+            'timestamp' => $this->timestamp,
+        ];
+    }
+
     /**
      * Creates an object from nats payload
      * @param array|object|string $payload
