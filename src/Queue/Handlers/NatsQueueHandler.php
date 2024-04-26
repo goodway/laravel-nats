@@ -93,7 +93,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
             ->handle(
                 function ($message) use ($consumer) {
 
-                    $messageData = unserialize($message);
+                    $messageData = unserialize($message) ?: '';
                     $messageObj = NatsMessage::parse($messageData, true);
 
                     if ($this->fireEvent) {

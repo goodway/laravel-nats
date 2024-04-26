@@ -95,7 +95,7 @@ final class NatsMessage
     public static function parse(array|object|string $payload, bool $deserialize = false): NatsMessage
     {
         if (is_string($payload)) {
-            if (!$deserialize) {
+            if (!$deserialize || empty($payload)) {
                 return new self ($payload);
             }
             $payload = unserialize($payload);
