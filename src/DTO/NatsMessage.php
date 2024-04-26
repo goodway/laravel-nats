@@ -13,6 +13,25 @@ final class NatsMessage
         public ?int      $timestamp = null,
     ) {}
 
+    public function __serialize(): array
+    {
+        return [
+            'body' => $this->body,
+            'headers' => $this->headers,
+            'subject' => $this->subject,
+            'timestamp' => $this->timestamp,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->body = $data['body'];
+        $this->headers = $data['headers'];
+        $this->subject = $data['subject'];
+        $this->timestamp = $data['timestamp'];
+    }
+
+
     public function body(): string
     {
         return $this->body;
