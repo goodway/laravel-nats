@@ -92,15 +92,17 @@ abstract class NatsQueueHandler implements INatsQueueHandler
             ->setDelay($this->delay)
             ->handle(
                 function ($message) use ($consumer) {
-                    $messageData = NatsMessage::parse($message, true);
+
+                    $messageData = unserialize($message);
+                    $messageObj = NatsMessage::parse($messageData, true);
 
                     if ($this->fireEvent) {
-                        event(new NatsQueueMessageReceived($this->queue, $messageData));
+                        event(new NatsQueueMessageReceived($this->queue, $messageObj));
                     }
 
-                    $this->handle($messageData, $this->queue, $consumer);
+                    $this->handle($messageObj, $this->queue, $consumer);
 
-                    if ($this->interruptOn($messageData, $this->queue, $consumer)) {
+                    if ($this->interruptOn($messageObj, $this->queue, $consumer)) {
                         $consumer->interrupt();
                     }
                 },

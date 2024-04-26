@@ -99,6 +99,9 @@ final class NatsMessage
                 return new self ($payload);
             }
             $payload = unserialize($payload);
+            if (!$payload) {
+                return new self ('');
+            }
         }
 
         if ($payload instanceof self) {
