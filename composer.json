@@ -10,7 +10,8 @@
         "jetstream",
         "laravel 8",
         "laravel 9",
-        "laravel 10"
+        "laravel 10",
+        "laravel 11"
     ],
     "type": "library",
     "license": "MIT",
@@ -27,7 +28,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "basis-company/nats": "^0.23.0",
+        "basis-company/nats": "^0.26.0",
         "nesbot/carbon": "^2.67"
     },
     "require-dev": {
