@@ -28,7 +28,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "basis-company/nats": "^0.26.0",
+        "basis-company/nats": "^0.26.2",
         "nesbot/carbon": "^2.67"
     },
     "require-dev": {
