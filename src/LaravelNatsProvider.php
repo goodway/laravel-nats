@@ -7,7 +7,7 @@ use Goodway\LaravelNats\Queue\NatsQueueConnector;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 
-class NatsQueueProvider extends ServiceProvider
+class LaravelNatsProvider extends ServiceProvider
 {
     /**
      * Register services.
@@ -18,6 +18,8 @@ class NatsQueueProvider extends ServiceProvider
             __DIR__.'/../config/nats.php',
             'nats'
         );
+
+        $this->app->register(NatsClientProvider::class);
     }
 
     /**

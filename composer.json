@@ -37,8 +37,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Goodway\\LaravelNats\\NatsClientProvider",
-                "Goodway\\LaravelNats\\NatsQueueProvider"
+                "Goodway\\LaravelNats\\LaravelNatsProvider"
             ]
         }
     }
