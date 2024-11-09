@@ -24,7 +24,7 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
      * Generates a message body to serialize
      * @return mixed
      */
-    abstract public function body(): mixed;
+    abstract public function body(): string;
 
     /**
      * Summary data that will be transmitted to your queue
