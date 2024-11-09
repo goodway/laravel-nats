@@ -6,12 +6,12 @@ class NatsMessageJobBase extends NatsMessageJob
 {
 
     public function __construct(
-        private readonly string $body,
+        private readonly mixed $body,
         private readonly array $headers = [],
         protected string $subject = 'default',
     ) {}
 
-    public function body(): string
+    public function body(): mixed
     {
         return $this->body;
     }
