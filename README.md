@@ -43,6 +43,7 @@ You should publish
 the [config/nats.php](https://github.com/goodway/laravel-nats/blob/main/config/nats.php) 
 config file with:
 ```bash
+$ php artisan vendor:publish --provider="Goodway\LaravelNats\NatsClientProvider"
 $ php artisan vendor:publish --provider="Goodway\LaravelNats\NatsQueueProvider"
 ```
 

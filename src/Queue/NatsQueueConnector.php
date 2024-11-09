@@ -2,20 +2,19 @@
 
 namespace Goodway\LaravelNats\Queue;
 
+use Goodway\LaravelNats\Contracts\INatsClientProvider;
 use Goodway\LaravelNats\Exceptions\NatsClientException;
-use Goodway\LaravelNats\NatsClientService;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandler;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandlerDefault;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 
 class NatsQueueConnector implements ConnectorInterface
 {
-    public function __construct() {
-        //
-    }
+    public function __construct(
+        public INatsClientProvider $natsClient
+    ) {}
 
     /**
-     * @throws NatsClientException
      */
     public function connect(array $config): NatsQueue
     {
@@ -23,12 +22,12 @@ class NatsQueueConnector implements ConnectorInterface
         $clientConfPublisher = $config['publisher_client'] ?? 'default';
         $separateIdentical = isset($config['queue_separated_clients']) && $config['queue_separated_clients'];
 
-        $clientSub = (new NatsClientService())->init($clientConfConsumer);
+        $clientSub = $this->natsClient->init($clientConfConsumer);
 //        $clientSub->setDelay(0.01, NatsConfiguration::DELAY_LINEAR);
 
         $clientPub = $clientConfConsumer === $clientConfPublisher && !$separateIdentical ?
             $clientSub
-            : (new NatsClientService())->init($clientConfPublisher)
+            : $this->natsClient->init($clientConfPublisher)
         ;
 
         $queueHandler = isset($config['queue_handler'])

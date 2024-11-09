@@ -2,7 +2,9 @@
 
 namespace Goodway\LaravelNats;
 
+use Goodway\LaravelNats\Contracts\INatsClientProvider;
 use Goodway\LaravelNats\Queue\NatsQueueConnector;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 
 class NatsQueueProvider extends ServiceProvider
@@ -21,17 +23,14 @@ class NatsQueueProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(): void
+    public function boot(QueueManager $manager, INatsClientProvider $natsClient): void
     {
         $this->offerPublishing();
 
-        $manager = $this->app['queue'];
         /**
          * Register connector for 'nats' queue driver
          */
-        $manager->addConnector('nats', function() {
-            return new NatsQueueConnector();
-        });
+        $manager->addConnector('nats', fn() => new NatsQueueConnector($natsClient));
     }
 
     protected function offerPublishing(): void

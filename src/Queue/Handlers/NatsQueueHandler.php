@@ -8,6 +8,7 @@ use Goodway\LaravelNats\Contracts\INatsQueueHandler;
 use Goodway\LaravelNats\DTO\NatsMessage;
 use Goodway\LaravelNats\Events\NatsQueueMessageReceived;
 use Goodway\LaravelNats\Exceptions\NatsConsumerException;
+use Throwable;
 
 abstract class NatsQueueHandler implements INatsQueueHandler
 {
@@ -110,7 +111,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
                     $this->handleEmpty($this->queue, $consumer);
                 }
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             var_dump($e->getMessage());
         }
 

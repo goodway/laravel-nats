@@ -1,29 +1,29 @@
 <?php
 
-namespace Goodway\LaravelNats;
+namespace Goodway\LaravelNats\Client;
 
-use Goodway\LaravelNats\DTO\NatsClientConfiguration;
-use Goodway\LaravelNats\Exceptions\NatsClientException;
 use Basis\Nats\Client as NatsClient;
 use Basis\Nats\Configuration as NatsConfiguration;
+use Goodway\LaravelNats\Contracts\INatsClientProvider;
+use Goodway\LaravelNats\DTO\NatsClientConfiguration;
+use Goodway\LaravelNats\Exceptions\NatsClientException;
 
-class NatsClientService
+class NatsClientService implements INatsClientProvider
 {
     public function __construct(
-
     ) {}
 
 
     /**
      * Initialize Nats Client with specific configuration
-     * @param string|array $configuration If string then import from nats.php configuration file
+     * @param string|array $configuration If string then import from $configurationFileName.php configuration file
      * @param string $configurationFileName Name of your nats configuration php file
      * @return NatsClient
      * @throws NatsClientException
      */
     public function init(
-        string|array $configuration = 'default',
-        string $configurationFileName = 'nats',
+        string|array    $configuration = 'default',
+        string          $configurationFileName = 'nats',
     ): NatsClient
     {
         $configArray = is_array($configuration) ? $configuration
