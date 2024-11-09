@@ -29,6 +29,7 @@ class NatsQueue extends Queue implements QueueContract
         protected ?bool      $fireEvents = null,
         protected string     $queueHandler = NatsQueueHandlerDefault::class, // you can put your custom queue handler
         protected bool       $verbose = false,
+        protected bool       $checkJetstreamOnPublish = true
     ) {}
 
 
@@ -58,7 +59,7 @@ class NatsQueue extends Queue implements QueueContract
     {
         $stream = $this->clientPub->getApi()->getStream($this->jetStream);
 
-        if (!$stream->exists()) {
+        if ($this->checkJetstreamOnPublish && !$stream->exists()) {
             throw new NatsJetstreamException('Jetstream ' . $this->jetStream . ' not found', 404);
         }
 

@@ -3,7 +3,6 @@
 namespace Goodway\LaravelNats\Queue;
 
 use Goodway\LaravelNats\Contracts\INatsClientProvider;
-use Goodway\LaravelNats\Exceptions\NatsClientException;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandler;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandlerDefault;
 use Illuminate\Queue\Connectors\ConnectorInterface;
@@ -23,8 +22,6 @@ class NatsQueueConnector implements ConnectorInterface
         $separateIdentical = isset($config['queue_separated_clients']) && $config['queue_separated_clients'];
 
         $clientSub = $this->natsClient->init($clientConfConsumer);
-//        $clientSub->setDelay(0.01, NatsConfiguration::DELAY_LINEAR);
-
         $clientPub = $clientConfConsumer === $clientConfPublisher && !$separateIdentical ?
             $clientSub
             : $this->natsClient->init($clientConfPublisher)
@@ -50,6 +47,7 @@ class NatsQueueConnector implements ConnectorInterface
             fireEvents: $config['fire_events'] ?? null,
             queueHandler: $queueHandler,
             verbose: $config['verbose_mode'] ?? false,
+            checkJetstreamOnPublish: (bool)($config['check_jetstream_publish'] ?? true),
         );
 
     }
