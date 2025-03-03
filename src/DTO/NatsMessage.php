@@ -113,10 +113,10 @@ final class NatsMessage
         }
 
         return new self (
-            $payload->body && is_string($payload->body) ? $payload->body : '',
-            $payload->headers && is_array($payload->headers) ? $payload->headers : [],
-            $payload->subject && is_string($payload->subject) ? $payload->subject : 'default',
-            $payload->timestamp && is_int($payload->timestamp) ? $payload->timestamp : null,
+            isset($payload->body) && is_string($payload->body) ? $payload->body : '',
+            isset($payload->headers) && is_array($payload->headers) ? $payload->headers : [],
+            isset($payload->subject) && is_string($payload->subject) ? $payload->subject : 'default',
+            isset($payload->timestamp) && is_int($payload->timestamp) ? $payload->timestamp : null,
         );
     }
 
