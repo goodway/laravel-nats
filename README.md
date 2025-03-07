@@ -134,7 +134,7 @@ Use this feature through the **"queue_separated_clients"** bool attribute.
 The easiest way to send a message to queue is to call a dispatch() method on a simple class
 that extends NatsMessageJob. The class must contain a body() method
 that will return the contents of the message.
-Return type for body() is mixed, it can be either a string or an array. This data will be serialized.
+Return type for body() is string.
 
 Example:
 ```
@@ -142,12 +142,12 @@ use Goodway\LaravelNats\NatsMessageJob;
 
 class TestNatsJob extends NatsMessageJob
 {
-    public function body(): mixed
+    public function body(): string
     {
-        return [
-            'data' => Str::random(32),
-            'group_random' => random_int(1,3),
-        ];
+        return json_encode([
+            'msd_id' => $this->msgId,
+            'push_data' => ['some_field' => md5($this->msgId)]
+        ]);
     }
 }
 ```
