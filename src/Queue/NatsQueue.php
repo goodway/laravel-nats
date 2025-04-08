@@ -48,7 +48,7 @@ class NatsQueue extends Queue implements QueueContract
             throw new NatsJetstreamException('Invalid jetStream retention policy', 422);
         }
 
-        $validate = $this->jetStreamRetentionPolicy->isWorkQueue() ?
+        $validate = $policy->isWorkQueue() ?
             $this->consumerGroup : ($this->consumerPrefix ? $this->consumerPrefix . '_' : '') . $this->consumerGroup . '_' . $queue;
 
         return preg_replace(
