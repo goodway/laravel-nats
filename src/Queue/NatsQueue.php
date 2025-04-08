@@ -3,8 +3,8 @@
 namespace Goodway\LaravelNats\Queue;
 
 use Basis\Nats\Client as NatsClient;
-use Basis\Nats\Stream\RetentionPolicy;
 use Goodway\LaravelNats\Contracts\INatsQueueHandler;
+use Goodway\LaravelNats\Enum\RetentionPolicy;
 use Goodway\LaravelNats\Events\NatsQueueMessageSent;
 use Goodway\LaravelNats\Exceptions\NatsJetstreamException;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandlerDefault;
@@ -16,20 +16,20 @@ class NatsQueue extends Queue implements QueueContract
 
 
     public function __construct(
-        protected NatsClient $clientSub,
-        protected NatsClient $clientPub,
-        protected string     $consumerGroup,
-        protected string     $jetStream,
-        protected string     $jetStreamRetentionPolicy = 'workqueue',
-        protected ?bool      $consumerCreate = null,
-        protected string     $consumerPrefix = 'con',
-        protected int        $consumerIterations = 0,
-        protected float      $consumerDelay = 0,
-        protected int        $batchSize = 0,
-        protected ?bool      $fireEvents = null,
-        protected string     $queueHandler = NatsQueueHandlerDefault::class, // you can put your custom queue handler
-        protected bool       $verbose = false,
-        protected bool       $checkJetstreamOnPublish = true
+        protected NatsClient                $clientSub,
+        protected NatsClient                $clientPub,
+        protected string                    $consumerGroup,
+        protected string                    $jetStream,
+        protected string|RetentionPolicy    $jetStreamRetentionPolicy = RetentionPolicy::WORK_QUEUE,
+        protected ?bool                     $consumerCreate = null,
+        protected string                    $consumerPrefix = 'con',
+        protected int                       $consumerIterations = 0,
+        protected float                     $consumerDelay = 0,
+        protected int                       $batchSize = 0,
+        protected ?bool                     $fireEvents = null,
+        protected string                    $queueHandler = NatsQueueHandlerDefault::class, // you can put your custom queue handler
+        protected bool                      $verbose = false,
+        protected bool                      $checkJetstreamOnPublish = true
     ) {}
 
 
@@ -37,11 +37,20 @@ class NatsQueue extends Queue implements QueueContract
      * Generates consumer name based on prefix, group and queue
      * @param string $queue
      * @return string
+     * @throws NatsJetstreamException
      */
     public function getConsumerName(string $queue): string
     {
-        $validate = $this->jetStreamRetentionPolicy === RetentionPolicy::WORK_QUEUE ?
+        $policy = is_string($this->jetStreamRetentionPolicy) ?
+            RetentionPolicy::tryFrom($this->jetStreamRetentionPolicy) : $this->jetStreamRetentionPolicy
+        ;
+        if (!$policy) {
+            throw new NatsJetstreamException('Invalid jetStream retention policy', 422);
+        }
+
+        $validate = $this->jetStreamRetentionPolicy->isWorkQueue() ?
             $this->consumerGroup : ($this->consumerPrefix ? $this->consumerPrefix . '_' : '') . $this->consumerGroup . '_' . $queue;
+
         return preg_replace(
             '~[\\\\/:*?"<>|+-.]~', '', $validate);
     }

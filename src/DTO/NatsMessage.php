@@ -2,10 +2,13 @@
 
 namespace Goodway\LaravelNats\DTO;
 
+use Goodway\LaravelNats\Helpers\StringHelper;
 use Goodway\LaravelNats\NatsMessageJobBase;
 
 final class NatsMessage
 {
+    use StringHelper;
+
     public function __construct(
         public string    $body = '',
         public array     $headers = [],
@@ -98,7 +101,7 @@ final class NatsMessage
             if (!$deserialize || empty($payload)) {
                 return new self ($payload);
             }
-            $payload = unserialize($payload);
+            $payload = self::isSerialized($payload) ? unserialize($payload) : $payload;
             if (!$payload) {
                 return new self ('');
             }

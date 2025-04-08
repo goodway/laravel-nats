@@ -8,10 +8,13 @@ use Goodway\LaravelNats\Contracts\INatsQueueHandler;
 use Goodway\LaravelNats\DTO\NatsMessage;
 use Goodway\LaravelNats\Events\NatsQueueMessageReceived;
 use Goodway\LaravelNats\Exceptions\NatsConsumerException;
+use Goodway\LaravelNats\Helpers\StringHelper;
 use Throwable;
 
 abstract class NatsQueueHandler implements INatsQueueHandler
 {
+    use StringHelper;
+
     public int $batchSize = 10;
     public int $iterations = 2;
     public float $delay = 1;
@@ -94,7 +97,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
             ->handle(
                 function ($message) use ($consumer) {
 
-                    $messageData = unserialize($message) ?: '';
+                    $messageData = static::isSerialized($message) ? unserialize($message) : $message;
                     $messageObj = NatsMessage::parse($messageData, true);
 
                     if ($this->fireEvent) {
