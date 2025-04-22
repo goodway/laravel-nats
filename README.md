@@ -68,6 +68,9 @@ Multiple configuration supported
                 'verbose_mode' => env('NATS_VERBOSE_MODE', false), // Turns on +OK protocol acknowledgements
                 'inbox_prefix' => env('NATS_INBOX_PREFIX', '_INBOX'), // Sets default prefix for automatically created inboxes
                 'ping_interval' => intval(env('NATS_PING_INTERVAL', 2)), // Number of seconds between client-sent pings
+                'ssl_key' => env('NATS_SSL_KEY_FILE'),
+                'ssl_cert' => env('NATS_SSL_CERT_FILE'),
+                'ssl_ca' => env('NATS_SSL_CA_FILE'),
             ],
             ...
         ]
