@@ -49,7 +49,7 @@ class NatsQueue extends Queue implements QueueContract
         }
 
         $validate = $policy->isWorkQueue() ?
-            $this->consumerGroup : ($this->consumerPrefix ? $this->consumerPrefix . '_' : '') . $this->consumerGroup . '_' . $queue;
+            $this->consumerGroup : ($this->consumerPrefix ? $this->consumerPrefix . '_' : '') . ($this->consumerGroup ? $this->consumerGroup . '_' : '') . $queue;
 
         return preg_replace(
             '~[\\\\/:*?"<>|+-.]~', '', $validate);
