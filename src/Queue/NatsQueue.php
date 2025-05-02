@@ -14,6 +14,11 @@ use Illuminate\Queue\Queue;
 class NatsQueue extends Queue implements QueueContract
 {
 
+    /** To use concrete durable consumer name instead of queue name
+     * @var string|null
+     */
+    protected ?string $consumer = null;
+
 
     public function __construct(
         protected NatsClient                $clientSub,
@@ -33,6 +38,25 @@ class NatsQueue extends Queue implements QueueContract
     ) {}
 
 
+    public function setJetstream(string $jetstream): static
+    {
+        $this->jetStream = $jetstream;
+        return $this;
+    }
+
+    public function setConsumer(string $consumer): static
+    {
+        $this->consumer = $consumer;
+        return $this;
+    }
+
+    public function setBatchSize(int $batchSize): static
+    {
+        $this->batchSize = $batchSize;
+        return $this;
+    }
+
+
     /**
      * Generates consumer name based on prefix, group and queue
      * @param string $queue
@@ -41,6 +65,12 @@ class NatsQueue extends Queue implements QueueContract
      */
     public function getConsumerName(string $queue): string
     {
+        if ($this->consumer) {
+            return $this->consumer;
+        }
+
+        /** If consumer is not set generate consumer name based on queue */
+
         $policy = is_string($this->jetStreamRetentionPolicy) ?
             RetentionPolicy::tryFrom($this->jetStreamRetentionPolicy) : $this->jetStreamRetentionPolicy
         ;
@@ -97,6 +127,10 @@ class NatsQueue extends Queue implements QueueContract
         // TODO: Implement later() method.
     }
 
+    /**
+     *
+     * @throws NatsJetstreamException
+     */
     public function pop($queue = null)
     {
 

@@ -3,6 +3,7 @@
 namespace Goodway\LaravelNats\Queue;
 
 use Goodway\LaravelNats\Contracts\INatsClientProvider;
+use Goodway\LaravelNats\DTO\NatsQueueCommandOptions;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandler;
 use Goodway\LaravelNats\Queue\Handlers\NatsQueueHandlerDefault;
 use Illuminate\Queue\Connectors\ConnectorInterface;
@@ -10,7 +11,8 @@ use Illuminate\Queue\Connectors\ConnectorInterface;
 class NatsQueueConnector implements ConnectorInterface
 {
     public function __construct(
-        public INatsClientProvider $natsClient
+        public INatsClientProvider $natsClient,
+        protected ?NatsQueueCommandOptions $commandOptions = null,
     ) {}
 
     /**
@@ -33,7 +35,7 @@ class NatsQueueConnector implements ConnectorInterface
                 : NatsQueueHandlerDefault::class
         ;
 
-        return new NatsQueue(
+        $queue = new NatsQueue(
             $clientSub,
             $clientPub,
             $config['consumer'],
@@ -50,5 +52,28 @@ class NatsQueueConnector implements ConnectorInterface
             checkJetstreamOnPublish: (bool)($config['check_jetstream_publish'] ?? true),
         );
 
+        return $this->setQueueCommandOptions($queue);
+    }
+
+
+    private function setQueueCommandOptions(NatsQueue $queue): NatsQueue
+    {
+        if (!$this->commandOptions) {
+            return $queue;
+        }
+
+        if ($this->commandOptions->jetstream) {
+            $queue->setJetstream($this->commandOptions->jetstream);
+        }
+
+        if ($this->commandOptions->consumer) {
+            $queue->setConsumer($this->commandOptions->consumer);
+        }
+
+        if ($this->commandOptions->batchSize) {
+            $queue->setBatchSize($this->commandOptions->batchSize);
+        }
+
+        return $queue;
     }
 }

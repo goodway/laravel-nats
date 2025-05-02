@@ -3,6 +3,7 @@
 namespace Goodway\LaravelNats;
 
 use Goodway\LaravelNats\Contracts\INatsClientProvider;
+use Goodway\LaravelNats\DTO\NatsQueueCommandOptions;
 use Goodway\LaravelNats\Queue\NatsQueueConnector;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
@@ -18,7 +19,7 @@ class LaravelNatsProvider extends ServiceProvider
             __DIR__.'/../config/nats.php',
             'nats'
         );
-
+        $this->app->register(CommandOptionsProvider::class);
         $this->app->register(NatsClientProvider::class);
     }
 
@@ -29,10 +30,17 @@ class LaravelNatsProvider extends ServiceProvider
     {
         $this->offerPublishing();
 
+
+        $commandOptions = $this->app->runningInConsole() ?
+            NatsQueueCommandOptions::parseFromCommand() : null
+        ;
+
         /**
          * Register connector for 'nats' queue driver
          */
-        $manager->addConnector('nats', fn() => new NatsQueueConnector($natsClient));
+        $manager->addConnector('nats',
+            fn() => new NatsQueueConnector(natsClient: $natsClient, commandOptions: $commandOptions)
+        );
     }
 
     protected function offerPublishing(): void
