@@ -1,7 +1,15 @@
-# Nats jetstream queue for Laravel
+# Nats JetStream queue driver for Laravel
+
+With multiple flexible client and queue configurations,
+with events and customizable handlers
+
 [![License](https://poser.pugx.org/goodway/laravel-nats/license.png)](https://packagist.org/packages/goodway/laravel-nats)
 [![Latest Version](https://img.shields.io/github/release/goodway/laravel-nats.svg)](https://github.com/goodway/laravel-nats/releases)
 [![Total Downloads](https://img.shields.io/packagist/dt/goodway/laravel-nats.svg)](https://packagist.org/packages/goodway/laravel-nats)
+
+---
+![Scheme](assets/img/base_showcase.png)
+
 
 Feel free to contribute or give any feedback.
 
