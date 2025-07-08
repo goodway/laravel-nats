@@ -19,7 +19,8 @@
     "autoload": {
         "psr-4": {
             "Goodway\\LaravelNats\\": "src/"
-        }
+        },
+        "files": ["src/Helpers/helpers.php"]
     },
     "authors": [
         {
