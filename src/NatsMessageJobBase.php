@@ -8,7 +8,7 @@ class NatsMessageJobBase extends NatsMessageJob
     public function __construct(
         private readonly string $body,
         private readonly array $headers = [],
-        protected string $subject = 'default',
+        protected ?string $subject = 'default',
     ) {}
 
     public function body(): string

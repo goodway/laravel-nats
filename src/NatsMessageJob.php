@@ -4,6 +4,7 @@ namespace Goodway\LaravelNats;
 
 use Goodway\LaravelNats\Contracts\INatsMessageJob;
 use Goodway\LaravelNats\DTO\NatsMessage;
+use Goodway\LaravelNats\Support\NatsDispatchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,13 +13,17 @@ use Illuminate\Queue\SerializesModels;
 
 abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, NatsDispatchable;
+    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * You can set specific subject for your job message payload with $subject variable
-     * @var string
+     * You can set specific subject and jetstream for your job message payload
+     * with $subject and $jetstream variables
      */
-    protected string $subject = 'default';
+    protected ?string $subject = null;
+    protected ?string $jetstream = null;
+
+    protected ?bool   $withEvents = null;
 
     /**
      * Generates a message body to serialize
@@ -54,6 +59,41 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
     {
         $this->subject = $subject;
         return $this;
+    }
+
+    /**
+     * Sets a specific jetstream for job message
+     * @param string $jetstream
+     * @return $this
+     */
+    public function setJetstream(string $jetstream): static
+    {
+        $this->jetstream = $jetstream;
+        return $this;
+    }
+
+    /**
+     * Specifies whether to call events or not for a specific job
+     */
+    public function setWithEvents(bool $withEvents): static
+    {
+        $this->withEvents = $withEvents;
+        return $this;
+    }
+
+    public function getSubject(): ?string
+    {
+        return $this->subject;
+    }
+
+    public function getJetstream(): ?string
+    {
+        return $this->jetstream;
+    }
+
+    public function getWithEvents(): ?bool
+    {
+        return $this->withEvents;
     }
 
     /**

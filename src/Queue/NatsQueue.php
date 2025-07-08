@@ -3,6 +3,7 @@
 namespace Goodway\LaravelNats\Queue;
 
 use Basis\Nats\Client as NatsClient;
+use Goodway\LaravelNats\Contracts\INatsMessageJob;
 use Goodway\LaravelNats\Contracts\INatsQueueHandler;
 use Goodway\LaravelNats\Enum\RetentionPolicy;
 use Goodway\LaravelNats\Events\NatsQueueMessageSent;
@@ -92,23 +93,31 @@ class NatsQueue extends Queue implements QueueContract
     }
 
     /**
+     * @param INatsMessageJob $job
+     * @param string $data
+     * @param $queue
      * @throws NatsJetstreamException
      */
     public function push($job, $data = '', $queue = null)
     {
-        $stream = $this->clientPub->getApi()->getStream($this->jetStream);
+        $streamName = $job->getJetstream() ?: $this->jetStream;
+        $stream = $this->clientPub->getApi()->getStream($streamName);
 
         if ($this->checkJetstreamOnPublish && !$stream->exists()) {
-            throw new NatsJetstreamException('Jetstream ' . $this->jetStream . ' not found', 404);
+            throw new NatsJetstreamException('Jetstream ' . $streamName . ' not found', 404);
         }
+
+        $subject = $queue ?: $job->getSubject();
 
         $jobData = $job->handle();
         $serialized = !is_string($jobData) ? serialize($jobData) : $jobData;
 
-        $stream->put($queue, $serialized);
+        $stream->put($subject, $serialized);
 
-        if ($this->fireEvents) {
-            event(new NatsQueueMessageSent($queue, $jobData));
+        $toFireEvents = $job->getWithEvents() ?? $this->fireEvents;
+
+        if ($toFireEvents) {
+            event(new NatsQueueMessageSent($subject, $jobData));
         }
 
         if ($this->verbose) {
