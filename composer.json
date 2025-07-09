@@ -1,6 +1,6 @@
 {
     "name": "goodway/laravel-nats",
-    "description": "Nats queue driver with client for Laravel",
+    "description": "Nats jetstream queue driver with client for Laravel",
     "keywords": [
         "php",
         "nats",
