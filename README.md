@@ -17,7 +17,7 @@ Feel free to contribute or give any feedback.
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Publishing](#publishing-to-queue)
-- [Listening](#listening-from-queue)
+- [Listening](#listening-from-queuejetstream-subject)
 - [Message](#message-object-structure)
 - [Events](#events)
 
@@ -166,22 +166,59 @@ class TestNatsJob extends NatsMessageJob
 You can also use a dynamic body by passing content through the constructor.
 
 NatsMessageJob class uses Dispatchable and Queueable concerns and implements classic ShouldQueue interface.
-Example:
+Examples:
 
 ```
-dispatch((new TestNatsJob())->onConnection('nats')->onQueue('queue-name');
+dispatch((new TestNatsJob())
+    ->onConnection('nats')
+    ->onQueue('jetstream_subject');
+```
+```
+TestNatsJob::dispatch()
+    ->onConnection('nats')
+    ->onQueue('jetstream_subject');
 ```
 
-You can also specify the subject for message using the $subject variable (default is "default"),
-or set it when dispatching a job.
+You can also specify the subject and jetstream for message using the \$subject
+and \$jetstream variables
 ```
-protected string $subject = 'mySubject';
+class
+    protected string $subject = 'mySubject';
 ```
-
+or
 ```
 dispatch((new TestNatsJob())
     ->setSubject('mySubject'))
     ->onConnection('nats')->onQueue('queue-name');
+```
+
+### DispatchNats
+
+This package provides an additional dispatch mechanism
+and a corresponding helper with the **dispatchNats()** function.
+It supports additional functions designed to make it easier
+to understand and interact with publishing.
+
+With **dispatchNats** You can set a specific jetstream or subject
+when dispatching a job. And also specify whether to call events.
+
+**Examples:**
+
+With helper function
+```
+dispatchNats((new TestNatsJob())
+    ->onConnection('nats')
+    ->onJetstream('jetstream_name')
+    ->onSubject('jetstream_subject')
+    ->withEvents();
+```
+With class static function
+```
+TestNatsJob::dispatchNats()
+    ->onConnection('nats')
+    ->onJetstream('jetstream_name')
+    ->onSubject('jetstream_subject')
+    ->withoutEvents();
 ```
 
 
@@ -204,7 +241,7 @@ class TestNatsJob extends NatsMessageJob
 ```
 
 
-## Listening from queue
+## Listening from queue/jetstream subject
 
 You can connect and listen to messages from the queue using standard **queue:work** mechanism.
 Example:
@@ -213,6 +250,18 @@ Example:
 php artisan queue:work nats --queue=queue-name
 ```
 
+### queue:work command options
+
+This package also extends the **queue:work** command and provides
+additional options that allow you to specify a jetstream and consumer you want to connect to,
+as well as to set the batch size for reading messages.
+
+```
+php artisan queue:work nats --jetstream=jetstream --consumer=durable_consumer --batch=50 --queue=any-name
+```
+**--consumer** option ignores the **--queue** option.
+In this case, the **--queue** option will not be used in the connection logic,
+it is only needed for visual recognition of the queue for the developer.
 
 ## Message object structure
 
@@ -232,10 +281,26 @@ These events are fired during the publishing and listening processes.
 ### NatsQueueMessageSent
 
 This event is fired after a message is sent to the queue
+```
+class NatsQueueMessageSent
+    ...
+    public function __construct(
+        public readonly string $subject,
+        public readonly NatsMessage $message
+    ) {}
+```
 
 ### NatsQueueMessageReceived
 
 This event is fired when a message is received from the queue
+```
+class NatsQueueMessageReceived
+    ...
+    public function __construct(
+        public readonly string $subject,
+        public readonly NatsMessage $message
+    ) {}
+```
 
 
 ---
