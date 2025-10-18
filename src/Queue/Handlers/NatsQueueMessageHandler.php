@@ -8,11 +8,15 @@ class NatsQueueMessageHandler
 {
     /**
      * @param NatsMessage $message deserialized message from queue
+     * @param string $jetstream jetstream name
      * @param string $subject queue/subject name
      */
-    public function __construct(NatsMessage $message, string $subject) {
+    public function __construct(NatsMessage $message, string $jetstream, string $subject) {
 
-        var_dump("\nNew message received from queue '$subject':\n" . $message->render());
+        var_dump(
+            "\nNew message received from jetstream $jetstream , subject '$subject':\n"
+            . $message->render()
+        );
 
     }
 }

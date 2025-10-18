@@ -3,8 +3,10 @@
 With multiple flexible client and queue configurations,
 with events and customizable handlers
 
-[![License](https://poser.pugx.org/goodway/laravel-nats/license.png)](https://packagist.org/packages/goodway/laravel-nats)
+
+[![PHP Version Requirement](https://img.shields.io/packagist/dependency-v/goodway/laravel-nats/php)](https://packagist.org/packages/goodway/laravel-nats)
 [![Latest Version](https://img.shields.io/github/release/goodway/laravel-nats.svg)](https://github.com/goodway/laravel-nats/releases)
+[![License](https://poser.pugx.org/goodway/laravel-nats/license.png)](https://packagist.org/packages/goodway/laravel-nats)
 [![Total Downloads](https://img.shields.io/packagist/dt/goodway/laravel-nats.svg)](https://packagist.org/packages/goodway/laravel-nats)
 
 ---

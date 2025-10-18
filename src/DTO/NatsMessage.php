@@ -2,6 +2,7 @@
 
 namespace Goodway\LaravelNats\DTO;
 
+use Goodway\LaravelNats\Enum\NatsMessageFormat;
 use Goodway\LaravelNats\Helpers\StringHelper;
 use Goodway\LaravelNats\NatsMessageJobBase;
 
@@ -91,30 +92,33 @@ final class NatsMessage
 
     /**
      * Creates an object from nats payload
-     * @param array|object|string $payload
-     * @param bool $deserialize
+     * @param mixed $payload
      * @return NatsMessage
      */
-    public static function parse(array|object|string $payload, bool $deserialize = false): NatsMessage
+    public static function parse(mixed $payload): NatsMessage
     {
-        if (is_string($payload)) {
-            if (!$deserialize || empty($payload)) {
-                return new self ($payload);
-            }
-            $payload = self::isSerialized($payload) ? unserialize($payload) : $payload;
-            if (!$payload) {
-                return new self ('');
-            }
-        }
+        /** Protect from double-serialized messages */
+        $payload = is_string($payload) && self::isSerialized($payload) ? unserialize($payload) : $payload;
 
-        if ($payload instanceof self) {
-            return $payload;
-        }
+        $format = NatsMessageFormat::fromMessage($payload);
 
-        if (is_array($payload)) {
-            $payload = (object)$payload;
-        }
+        return match(true) {
+            $format->isObjectOrigin() => $payload, // returns origin dto object
+            $format->isObject() => self::parseFromObject($payload),
+            $format->isArray() => self::parseFromObject((object)$payload),
+            $format->isJsonString() => self::parseFromObject((object)json_decode($payload, true)),
+            $format->isPlainString() => new self ($payload),
+            $format->isUnknown() => new self ('Unknown message format'),
+        };
+    }
 
+    /**
+     * Parse from simple object
+     * @param object $payload
+     * @return NatsMessage
+     */
+    public static function parseFromObject(object $payload): NatsMessage
+    {
         return new self (
             isset($payload->body) && is_string($payload->body) ? $payload->body : '',
             isset($payload->headers) && is_array($payload->headers) ? $payload->headers : [],

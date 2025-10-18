@@ -3,6 +3,7 @@
 namespace Goodway\LaravelNats\Support;
 
 use Goodway\LaravelNats\Contracts\INatsMessageJob;
+use Goodway\LaravelNats\Enum\NatsMessageFormat;
 use Illuminate\Foundation\Bus\PendingDispatch;
 
 /**
@@ -31,6 +32,16 @@ class NatsPendingDispatch extends PendingDispatch
     public function onSubject(string $subject): static
     {
         $this->job->setSubject($subject);
+        return $this;
+    }
+
+    /**
+     * To send message as simple JSON instead of serialized data
+     * @return $this
+     */
+    public function asJson(): static
+    {
+        $this->job->setSendFormat(NatsMessageFormat::JSON);
         return $this;
     }
 

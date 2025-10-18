@@ -110,14 +110,18 @@ class NatsQueue extends Queue implements QueueContract
         $subject = $queue ?: $job->getSubject();
 
         $jobData = $job->handle();
-        $serialized = !is_string($jobData) ? serialize($jobData) : $jobData;
 
-        $stream->put($subject, $serialized);
+        $payload = match(true) {
+            $job->getSendFormat()->isJsonString() => json_encode($jobData->toArray()),
+            default => !is_string($jobData) ? serialize($jobData) : $jobData,
+        };
+
+        $stream->put($subject, $payload);
 
         $toFireEvents = $job->getWithEvents() ?? $this->fireEvents;
 
         if ($toFireEvents) {
-            event(new NatsQueueMessageSent($subject, $jobData));
+            event(new NatsQueueMessageSent($streamName, $subject, $jobData));
         }
 
         if ($this->verbose) {

@@ -23,7 +23,7 @@ abstract class NatsQueueHandler implements INatsQueueHandler
     public bool $fireEvent = true;
 
 
-    abstract public function handle(NatsMessage $message, string $queue, Consumer $consumer);
+    abstract public function handle(NatsMessage $message, string $jetstream, string $queue, Consumer $consumer);
     abstract public function handleEmpty(string $queue, Consumer $consumer);
 
 
@@ -98,17 +98,19 @@ abstract class NatsQueueHandler implements INatsQueueHandler
                 function ($message) use ($consumer) {
 
                     $messageData = static::isSerialized($message) ? unserialize($message) : $message;
-                    $messageObj = NatsMessage::parse($messageData, true);
+
+                    $messageObj = NatsMessage::parse($messageData);
 
                     if ($this->fireEvent) {
-                        event(new NatsQueueMessageReceived($this->queue, $messageObj));
+                        event(new NatsQueueMessageReceived($this->jetStream, $this->queue, $messageObj));
                     }
 
-                    $this->handle($messageObj, $this->queue, $consumer);
+                    $this->handle($messageObj, $this->jetStream, $this->queue, $consumer);
 
                     if ($this->interruptOn($messageObj, $this->queue, $consumer)) {
                         $consumer->interrupt();
                     }
+
                 },
                 function () use ($consumer) {
                     $this->handleEmpty($this->queue, $consumer);

@@ -7,7 +7,7 @@ use Goodway\LaravelNats\DTO\NatsMessage;
 
 interface INatsQueueHandler
 {
-    public function handle(NatsMessage $message, string $queue, Consumer $consumer);
+    public function handle(NatsMessage $message, string $jetstream, string $queue, Consumer $consumer);
     public function handleEmpty(string $queue, Consumer $consumer);
     public function setBatchSize(int $batchSize): static;
     public function setIterations(int $iterations): static;

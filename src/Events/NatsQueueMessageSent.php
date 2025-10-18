@@ -14,6 +14,7 @@ class NatsQueueMessageSent
      * Create a new event instance.
      */
     public function __construct(
+        public readonly string $jetstream,
         public readonly string $subject,
         public readonly NatsMessage $message
     ) {}

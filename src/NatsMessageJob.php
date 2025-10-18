@@ -4,6 +4,7 @@ namespace Goodway\LaravelNats;
 
 use Goodway\LaravelNats\Contracts\INatsMessageJob;
 use Goodway\LaravelNats\DTO\NatsMessage;
+use Goodway\LaravelNats\Enum\NatsMessageFormat;
 use Goodway\LaravelNats\Support\NatsDispatchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,6 +25,12 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
     protected ?string $jetstream = null;
 
     protected ?bool   $withEvents = null;
+
+    /**
+     * Defines the format used when sending a message. Nats message object or simple JSON
+     * @var NatsMessageFormat
+     */
+    protected NatsMessageFormat $sendFormat = NatsMessageFormat::OBJECT_ORIGIN;
 
     /**
      * Generates a message body to serialize
@@ -81,6 +88,19 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
         return $this;
     }
 
+    /**
+     * Specifies the format used when sending a message. Nats message object or simple JSON
+     * @param NatsMessageFormat $format
+     * @return $this
+     */
+    public function setSendFormat(NatsMessageFormat $format): static
+    {
+        if (in_array($format, [NatsMessageFormat::OBJECT_ORIGIN, NatsMessageFormat::JSON])) {
+            $this->sendFormat = $format;
+        }
+        return $this;
+    }
+
     public function getSubject(): ?string
     {
         return $this->subject;
@@ -94,6 +114,11 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
     public function getWithEvents(): ?bool
     {
         return $this->withEvents;
+    }
+
+    public function getSendFormat(): NatsMessageFormat
+    {
+        return $this->sendFormat;
     }
 
     /**
