@@ -13,7 +13,8 @@ final class NatsMessage
     public function __construct(
         public string    $body = '',
         public array     $headers = [],
-        public string    $subject = 'default',
+        public ?string   $jetstream = null,
+        public ?string   $subject = null,
         public ?int      $timestamp = null,
     ) {}
 
@@ -22,6 +23,7 @@ final class NatsMessage
         return [
             'body' => $this->body,
             'headers' => $this->headers,
+            'jetstream' => $this->jetstream,
             'subject' => $this->subject,
             'timestamp' => $this->timestamp,
         ];
@@ -31,6 +33,7 @@ final class NatsMessage
     {
         $this->body = $data['body'];
         $this->headers = $data['headers'];
+        $this->jetstream = $data['jetstream'];
         $this->subject = $data['subject'];
         $this->timestamp = $data['timestamp'];
     }
@@ -45,9 +48,15 @@ final class NatsMessage
     {
         return $this->headers;
     }
+
     public function subject(): ?string
     {
         return $this->subject;
+    }
+
+    public function jetstream(): ?string
+    {
+        return $this->jetstream;
     }
 
     public function timestamp(): ?int
@@ -85,6 +94,7 @@ final class NatsMessage
         return [
             'body' => $this->body,
             'headers' => $this->headers,
+            'jetstream' => $this->jetstream,
             'subject' => $this->subject,
             'timestamp' => $this->timestamp,
         ];
@@ -122,9 +132,22 @@ final class NatsMessage
         return new self (
             isset($payload->body) && is_string($payload->body) ? $payload->body : '',
             isset($payload->headers) && is_array($payload->headers) ? $payload->headers : [],
-            isset($payload->subject) && is_string($payload->subject) ? $payload->subject : 'default',
+            isset($payload->jetstream) && is_string($payload->jetstream) ? $payload->jetstream : null,
+            isset($payload->subject) && is_string($payload->subject) ? $payload->subject : null,
             isset($payload->timestamp) && is_int($payload->timestamp) ? $payload->timestamp : null,
         );
+    }
+
+    public function setJetstream(string $jetstream): NatsMessage
+    {
+        $this->jetstream = $jetstream;
+        return $this;
+    }
+
+    public function setSubject(string $subject): NatsMessage
+    {
+        $this->subject = $subject;
+        return $this;
     }
 
     /**

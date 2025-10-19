@@ -102,7 +102,11 @@ abstract class NatsQueueHandler implements INatsQueueHandler
                     }
 
                     $messageData = static::isSerialized($message) ? unserialize($message) : $message;
-                    $messageObj = NatsMessage::parse($messageData);
+
+                    $messageObj = NatsMessage::parse($messageData)
+                        ->setJetstream($this->jetStream)
+                        ->setSubject($this->queue)
+                    ;
 
                     if ($this->fireEvent) {
                         event(new NatsQueueMessageReceived($this->jetStream, $this->queue, $messageObj));

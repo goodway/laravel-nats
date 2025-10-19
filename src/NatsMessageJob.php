@@ -39,7 +39,7 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
     abstract public function body(): string;
 
     /**
-     * Summary data that will be transmitted to your queue
+     * Summary data that will be transmitted to your queue/subject
      * @return NatsMessage
      */
     public function handle(): NatsMessage
@@ -47,6 +47,7 @@ abstract class NatsMessageJob implements ShouldQueue, INatsMessageJob
         return (new NatsMessage(
             $this->body(),
             $this->headers(),
+            $this->jetstream,
             $this->subject,
             $this->getTimestamp(),
         ));
