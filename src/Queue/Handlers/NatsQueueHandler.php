@@ -97,8 +97,11 @@ abstract class NatsQueueHandler implements INatsQueueHandler
             ->handle(
                 function ($message) use ($consumer) {
 
-                    $messageData = static::isSerialized($message) ? unserialize($message) : $message;
+                    if ($message instanceof \Basis\Nats\Message\Payload) {
+                        $message = $message->body;
+                    }
 
+                    $messageData = static::isSerialized($message) ? unserialize($message) : $message;
                     $messageObj = NatsMessage::parse($messageData);
 
                     if ($this->fireEvent) {
