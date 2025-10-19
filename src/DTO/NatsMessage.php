@@ -150,6 +150,24 @@ final class NatsMessage
         return $this;
     }
 
+    public function setTimestamp(int $timestamp): NatsMessage
+    {
+        $this->timestamp = $timestamp;
+        return $this;
+    }
+
+    /**
+     * Sets the timestamp if it is not set
+     * @return NatsMessage
+     */
+    public function setTimestampIfNull(): NatsMessage
+    {
+        if (is_null($this->timestamp)) {
+            $this->timestamp = now()->getTimestampMs();
+        }
+        return $this;
+    }
+
     /**
      * To broadcast current message to certain connection and queue
      * @param string $queueConnection

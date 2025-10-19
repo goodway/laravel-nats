@@ -97,24 +97,15 @@ abstract class NatsQueueHandler implements INatsQueueHandler
             ->handle(
                 function ($message) use ($consumer) {
 
-                    if ($message instanceof \Basis\Nats\Message\Payload) {
-                        $message = $message->body;
-                    }
-
-                    $messageData = static::isSerialized($message) ? unserialize($message) : $message;
-
-                    $messageObj = NatsMessage::parse($messageData)
-                        ->setJetstream($this->jetStream)
-                        ->setSubject($this->queue)
-                    ;
+                    $natsMessage = $this->initializeMessage($message);
 
                     if ($this->fireEvent) {
-                        event(new NatsQueueMessageReceived($this->jetStream, $this->queue, $messageObj));
+                        event(new NatsQueueMessageReceived($this->jetStream, $this->queue, $natsMessage));
                     }
 
-                    $this->handle($messageObj, $this->jetStream, $this->queue, $consumer);
+                    $this->handle($natsMessage, $this->jetStream, $this->queue, $consumer);
 
-                    if ($this->interruptOn($messageObj, $this->queue, $consumer)) {
+                    if ($this->interruptOn($natsMessage, $this->queue, $consumer)) {
                         $consumer->interrupt();
                     }
 
@@ -128,6 +119,26 @@ abstract class NatsQueueHandler implements INatsQueueHandler
         }
 
     }
+
+    /**
+     * @param mixed $payload
+     * @return NatsMessage
+     */
+    private function initializeMessage(mixed $payload): NatsMessage
+    {
+        if ($payload instanceof \Basis\Nats\Message\Payload) {
+            $payload = $payload->body;
+        }
+
+        $messageData = static::isSerialized($payload) ? unserialize($payload) : $payload;
+
+        return NatsMessage::parse($messageData)
+            ->setJetstream($this->jetStream)
+            ->setSubject($this->queue)
+            ->setTimestampIfNull()
+        ;
+    }
+
 
     /**
      * True if you need to break on next iteration. The interrupt() method will be called,
