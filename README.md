@@ -253,7 +253,7 @@ Example:
 php artisan queue:work nats --queue=queue-name
 ```
 
-### queue:work command options
+### queue:work command options (Recommended)
 
 This package also extends the **queue:work** command and provides
 additional options that allow you to specify a jetstream and consumer you want to connect to,
@@ -270,7 +270,7 @@ it is only needed for visual recognition of the queue for the developer.
 
 ```
 {
-    "body": [string] serialized data of your message body
+    "body": [string] any string: plain text, json-string or serialized data of your message
     "headers": [array] headers array
     "subject": [string] subject value
     "timestamp": [int] timestamp in ms
@@ -288,6 +288,7 @@ This event is fired after a message is sent to the queue
 class NatsQueueMessageSent
     ...
     public function __construct(
+        public readonly string $jetstream,
         public readonly string $subject,
         public readonly NatsMessage $message
     ) {}
@@ -300,6 +301,7 @@ This event is fired when a message is received from the queue
 class NatsQueueMessageReceived
     ...
     public function __construct(
+        public readonly string $jetstream,
         public readonly string $subject,
         public readonly NatsMessage $message
     ) {}

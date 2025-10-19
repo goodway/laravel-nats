@@ -100,12 +100,12 @@ abstract class NatsQueueHandler implements INatsQueueHandler
                     $natsMessage = $this->initializeMessage($message);
 
                     if ($this->fireEvent) {
-                        event(new NatsQueueMessageReceived($this->jetStream, $this->queue, $natsMessage));
+                        event(new NatsQueueMessageReceived($this->jetStream, $natsMessage->subject, $natsMessage));
                     }
 
-                    $this->handle($natsMessage, $this->jetStream, $this->queue, $consumer);
+                    $this->handle($natsMessage, $this->jetStream, $natsMessage->subject, $consumer);
 
-                    if ($this->interruptOn($natsMessage, $this->queue, $consumer)) {
+                    if ($this->interruptOn($natsMessage, $natsMessage->subject, $consumer)) {
                         $consumer->interrupt();
                     }
 
@@ -126,17 +126,27 @@ abstract class NatsQueueHandler implements INatsQueueHandler
      */
     private function initializeMessage(mixed $payload): NatsMessage
     {
-        if ($payload instanceof \Basis\Nats\Message\Payload) {
-            $payload = $payload->body;
-        }
+        $originSubject = $payload->subject;
+        $originHeaders = $payload->headers;
+        $originTimestamp = $payload->timestampNanos;
+
+        $payload = $payload->body;
 
         $messageData = static::isSerialized($payload) ? unserialize($payload) : $payload;
 
-        return NatsMessage::parse($messageData)
+        $message = NatsMessage::parse($messageData)
             ->setJetstream($this->jetStream)
-            ->setSubject($this->queue)
-            ->setTimestampIfNull()
+            ->setSubject($originSubject)
+            ->putHeaders($originHeaders)
         ;
+
+        if ($originTimestamp) {
+            $message->setTimestamp($originTimestamp);
+        }
+
+        $message->setTimestampIfNull();
+
+        return $message;
     }
 
 

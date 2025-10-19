@@ -138,6 +138,18 @@ final class NatsMessage
         );
     }
 
+    public function setHeaders(array $headers): NatsMessage
+    {
+        $this->headers = $headers;
+        return $this;
+    }
+
+    public function putHeaders(array $headers): NatsMessage
+    {
+        $this->headers = array_merge($this->headers, $headers);
+        return $this;
+    }
+
     public function setJetstream(string $jetstream): NatsMessage
     {
         $this->jetstream = $jetstream;

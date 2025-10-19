@@ -18,13 +18,13 @@ class NatsQueueHandlerDefault extends NatsQueueHandler
      * Default handler for a new message received
      * @param NatsMessage $message
      * @param string $jetstream
-     * @param string $queue
+     * @param string $queue subject
      * @param Consumer $consumer
      * @return void
      */
     public function handle(NatsMessage $message, string $jetstream, string $queue, Consumer $consumer): void
     {
-        new NatsQueueMessageHandler($message, $jetstream, $this->queue);
+        new NatsQueueMessageHandler($message, $jetstream, $queue);
     }
 
     /**
