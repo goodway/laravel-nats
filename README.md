@@ -110,7 +110,7 @@ Example:
         'fire_events' => (bool)env('NATS_QUEUE_MESSAGE_EVENTS', true),
         'default_batch_size' => intval(env('NATS_DEFAULT_BATCH_SIZE', 10)),
         'verbose_mode' => (bool)env('NATS_QUEUE_VERBOSE_MODE', true),
-        'check_jetstream_publish' => (bool)env('NATS_QUEUE_CHECK_JETSTREAM_PUBLISH', true)
+        'check_jetstream_publish' => (bool)env('NATS_QUEUE_CHECK_JETSTREAM_PUBLISH', false)
     ],
 ```
 
@@ -133,7 +133,8 @@ This functionality only works if the current connection client has the necessary
 - **default_batch_size** - [int, optional, 10] batch size. How many messages would be requested from nats stream
 - **queue_handler** - [string, optional] classname of your custom queue handler. If not defined, then the standard handler will be used
 - **verbose_mode** - [bool, optional, false] var_dump some additional info. For example on publishing
-- **check_jetstream_publish** [bool, optional, true] - additionally check for the existence of a jetstream with each PUB
+- **check_jetstream_publish** [bool, optional, false] - additionally check for the existence of a jetstream with each PUB.
+When enabled, it can significantly slow down performance because in this case an additional request-response to the Jetstream API is required
 
 You can specify one connection for publisher and another one for consumer,
 or use one connection for both roles.

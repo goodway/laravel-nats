@@ -49,7 +49,7 @@ class NatsQueueConnector implements ConnectorInterface
             fireEvents: $config['fire_events'] ?? null,
             queueHandler: $queueHandler,
             verbose: $config['verbose_mode'] ?? false,
-            checkJetstreamOnPublish: (bool)($config['check_jetstream_publish'] ?? true),
+            checkJetstreamOnPublish: (bool)($config['check_jetstream_publish'] ?? false),
         );
 
         return $this->setQueueCommandOptions($queue);

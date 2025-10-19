@@ -35,7 +35,7 @@ class NatsQueue extends Queue implements QueueContract
         protected ?bool                     $fireEvents = null,
         protected string                    $queueHandler = NatsQueueHandlerDefault::class, // you can put your custom queue handler
         protected bool                      $verbose = false,
-        protected bool                      $checkJetstreamOnPublish = true
+        protected bool                      $checkJetstreamOnPublish = false
     ) {}
 
 
