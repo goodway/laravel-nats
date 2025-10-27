@@ -31,11 +31,11 @@ final class NatsMessage
 
     public function __unserialize(array $data): void
     {
-        $this->body = $data['body'];
-        $this->headers = $data['headers'];
-        $this->jetstream = $data['jetstream'];
-        $this->subject = $data['subject'];
-        $this->timestamp = $data['timestamp'];
+        $this->body = $data['body'] ?? '';
+        $this->headers = $data['headers'] ?? [];
+        $this->jetstream = $data['jetstream'] ?? null;
+        $this->subject = $data['subject'] ?? null;
+        $this->timestamp = $data['timestamp'] ?? null;
     }
 
 
