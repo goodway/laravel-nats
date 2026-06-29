@@ -187,4 +187,54 @@ class NatsQueue extends Queue implements QueueContract
             $handler->withEvent($this->fireEvents);
         }
     }
+
+
+    /**
+     * Get the number of pending jobs in the queue.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function pendingSize($queue = null): int
+    {
+        return 0;
+    }
+
+
+    /**
+     * Get the number of delayed jobs in the queue.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function delayedSize($queue = null): int
+    {
+        return 0;
+    }
+
+
+    /**
+     * Get the number of reserved jobs in the queue.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function reservedSize($queue = null): int
+    {
+        return 0;
+    }
+
+
+    /**
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function creationTimeOfOldestPendingJob($queue = null): ?int
+    {
+        return null;
+    }
+
+
 }
